@@ -1,0 +1,11 @@
+.navbar {
+  height: 50px;
+}
+.mr-auto i {
+  padding-left: 15px;
+}
+.navbar-brand {
+  padding: 0 15px;
+  height: 30px;
+  line-height: 30px;
+}

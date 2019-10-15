@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>To-Do</title>
+
+    <link href="../css/styles.css" rel="stylesheet" type="text/css" />
+
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.js"></script>
+    <script src="//fb.me/react-with-addons-0.10.0.js"></script>
+    <script src="//fb.me/JSXTransformer-0.10.0.js"></script>
+</head>
+<body>
+
+    <header><h1>To-Do</h1></header>
+    <section id="main"></section>
+    <footer><a class="code" href="https://github.com/ktrain/todo-react/">The code</a></footer>
+
+    <script type="text/jsx">
+    /** @jsx React.DOM */
+
+    // addons
+    var ReactClassSet = React.addons.classSet;
+    var ReactCSSTransitionGroup = React.addons.CSSTransitionGroup;
+
+    var List = React.createClass({
+        getInitialState: function() {
+            return { items: [], working: false, workingSince: 0 };
+        },
+
+        componentDidMount: function() {
+            $.get(this.props.source, function(result) {
+                var items = {};
+                result.map(function(item) {
+                    items[item.id] = item;
+                });
+                this.setState({ items: items });
+            }.bind(this));
+        },
+
+        componentDidUpdate: function(prevProps, prevState) {
+            // when the working state blips, save the signal
+            if (!prevState.working && this.state.working) {
+                this.setState({ workingSince: Date.now() });
+            }
+        },
+
+        addItem: function(newItemValue, callback) {
+            this.setState({ working: true });
+            var items = this.state.items;
+            var newItemData = {
+                // TODO: fix this
+                index: 0,
+                value: newItemValue,
+                checked: false
+            };
+
+            $.post(this.props.source, newItemData, function(data) {
+                items[data.id] = data;
+                this.setState({ items: items, working: false }, function() {
+                    console.log('added new item:');
+                    console.log(data);
+                    if (typeof callback === 'function') {
+                        callback(data);
+                    }
+                });
+            }.bind(this));
+        },
+
+        removeItem: function(id) {
+            this.setState({ working: true });
+            console.log('deleting items[' + id + ']');
+            var deleteTarget = this.state.items[id];
+            console.log(this.state.items);
+            if (!deleteTarget) {
+                console.log('no target');
+                return;
+            }
+
+            $.ajax({
+                type: 'DELETE',
+                url: this.props.source + '/' + deleteTarget.id,
+                success: function() {
+                    var items = this.state.items;
+                    delete items[id];
+                    this.setState({ items: items, working: false });
+                }.bind(this)
+            });
+        },
+
+        updateItem: function(newData, callback) {
+            this.setState({ working: true });
+            console.log(newData);
+            $.ajax({
+                type: 'PUT',
+                url: this.props.source + '/' + newData.id,
+                data: newData,
+                success: function(data) {
+                    var items = this.state.items;
+                    items[newData.id] = data;
+                    this.setState({ items: items, working: false }, function() {
+                        if (typeof callback === 'function') {
+                            callback(data);
+                        }
+                    });
+                }.bind(this)
+            });
+        },
+
+        render: function() {
+            // render items
+            var renderedItems = Object.keys(this.state.items).map(function(id) {
+                var item = this.state.items[id];
+                return (
+                    <Item key={id}
+                        id={item.id}
+                        value={item.value}
+                        checked={item.checked}
+                        deleteCallback={this.removeItem}
+                        updateCallback={this.updateItem}
+                    />
+                );
+            }.bind(this));
+
+            var showWorking = (Date.now() - this.state.workingSince) < 1000;
+
+            return (
+                <div className="list">
+                    <ol>
+                        <ReactCSSTransitionGroup transitionName="item">
+                            {renderedItems}
+                        </ReactCSSTransitionGroup>
+                        <ItemNewField saveCallback={this.addItem} />
+                    </ol>
+                    <LoadingNotification show={showWorking} />
+                </div>
+            );
+        }
+    });
+
+    var ItemNewField = React.createClass({
+        getInitialState: function() {
+            return { value: '' };
+        },
+
+        onKeyPress: function(evt) {
+            if (evt.keyCode === 13) {
+                this.save();
+            }
+        },
+
+        handleChange: function(evt) {
+            this.setState({ value: evt.target.value });
+        },
+
+        save: function() {
+            if (!this.state.value) {
+                return;
+            }
+            this.props.saveCallback(this.state.value, function() {
+                this.setState(this.getInitialState());
+            }.bind(this));
+        },
+
+        render: function() {
+            return (<li><div><input
+                type="text"
+                className="new-field"
+                placeholder="New item"
+                onChange={this.handleChange}
+                onBlur={this.save}
+                onKeyPress={this.onKeyPress}
+                value={this.state.value}
+            /></div></li>);
+        }
+    });
+
+    var ItemField = React.createClass({
+        getInitialState: function() {
+            return {
+                value: this.props.initialValue,
+                initialValue: this.props.initialValue,
+                editMode: false
+            };
+        },
+
+        onKeyPress: function(evt) {
+            if (evt.keyCode === 13) {
+                this.save();
+            }
+        },
+
+        handleClick: function(evt) {
+            this.enableEditMode(function() {
+                $(this.getDOMNode()).find('input[type="text"]').focus();
+            }.bind(this));
+        },
+
+        enableEditMode: function(callback) {
+            this.setState({
+                editMode: true
+            }, function() {
+                if (typeof callback === 'function') {
+                    callback();
+                }
+            });
+        },
+
+        disableEditMode: function() {
+            this.setState({ editMode: false });
+        },
+
+        handleChange: function(evt) {
+            this.setState({ value: evt.target.value });
+        },
+
+        showDeleteButton: function() {
+            this.setState({ showDeleteButton: true });
+        },
+
+        hideDeleteButton: function() {
+            this.setState({ showDeleteButton: false });
+        },
+
+        save: function() {
+            if (this.state.value == this.props.initialValue) {
+                this.disableEditMode();
+                return;
+            }
+            var newData = {
+                id: this.props.id,
+                value: this.state.value
+            };
+            this.props.updateCallback(newData, function() {
+                this.disableEditMode();
+            }.bind(this));
+        },
+
+        render: function() {
+            if (!this.state.editMode) {
+                // display mode
+                return (
+                    <div className="field-wrapper"
+                        onClick={this.handleClick}
+                        onMouseOver={this.showDeleteButton}
+                        onMouseOut={this.hideDeleteButton}
+                    >
+                        {this.state.value}
+                        <DeleteButton show={this.state.showDeleteButton} id={this.props.id} deleteCallback={this.props.deleteCallback} />
+                    </div>
+                );
+            }
+
+            // edit mode
+            return (
+                <div>
+                    <input
+                        type="text"
+                        onChange={this.handleChange}
+                        onBlur={this.save}
+                        onKeyPress={this.onKeyPress}
+                        value={this.state.value}
+                    />
+                    <DeleteButton
+                        show={this.state.showDeleteButton}
+                        id={this.props.id}
+                        deleteCallback={this.props.deleteCallback}
+                    />
+                </div>
+            );
+        }
+    });
+
+    var Item = React.createClass({
+        render: function() {
+            return (
+                <li>
+                    <ItemCheckbox
+                        id={this.props.id}
+                        checked={this.props.checked}
+                        updateCallback={this.props.updateCallback}
+                    />
+                    <ItemField
+                        id={this.props.id}
+                        initialValue={this.props.value}
+                        updateCallback={this.props.updateCallback}
+                        deleteCallback={this.props.deleteCallback}
+                    />
+                </li>
+            );
+        }
+    });
+
+    var ItemCheckbox = React.createClass({
+        handleChange: function(evt) {
+            this.props.updateCallback({
+                id: this.props.id,
+                checked: this.refs.box.getDOMNode().checked
+            });
+        },
+
+        render: function() {
+            return (
+                <input type="checkbox" ref="box" checked={this.props.checked} onChange={this.handleChange} />
+            );
+        }
+    });
+
+    var DeleteButton = React.createClass({
+        handleClick: function() {
+            this.props.deleteCallback(this.props.id);
+        },
+        render: function() {
+            var classes = ReactClassSet({
+                'delete': true,
+                'show'  : this.props.show
+            });
+            return <a className={classes} onClick={this.handleClick}>X</a>;
+        },
+    });
+
+
+    var LoadingNotification = React.createClass({
+        render: function() {
+            var classes = ReactClassSet({
+                'loading'   : true,
+                'show'      : this.props.show
+            });
+            return (
+                <div className="loading-container">
+                    <div className={classes}></div>
+                </div>
+            );
+        }
+    });
+
+
+    setInterval(function() {
+        React.renderComponent(
+            <List source="/api/items" />,
+            document.getElementById('main')
+        );
+    }, 500);
+    </script>
+
+</body>
+</html>

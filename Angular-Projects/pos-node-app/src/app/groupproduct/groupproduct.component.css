@@ -1,0 +1,22 @@
+.error {
+	color: red;
+}
+.alert {
+	z-index: 999;
+  	position: fixed;
+	width: 450px;
+	height: 60px;
+	/* opacity: 0.9; */
+	right: 0;
+    left: 0;
+    top: 7px;
+    margin-right: auto;
+    margin-left: auto;
+}
+table th,
+table td {
+  padding: 0px 10px;
+  vertical-align: middle;
+}
+
+

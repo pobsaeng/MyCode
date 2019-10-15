@@ -1,0 +1,51 @@
+<table cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered table-product mx-auto">
+  <thead>
+    <tr>
+      <th>ISBN</th>
+      <th>Title</th>
+      <th>Author</th>
+      <th>Publisher</th>
+      <th>Price</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let product of products">
+      <td [ngClass]="'td-hover'" (click)="open(content, product.isbn)">{{product.isbn}}</td>
+      <td>{{product.title}}</td>
+      <td>{{product.author}}</td>
+      <td>{{product.publisher}}</td>
+      <td>{{product.price}}</td>
+    </tr>
+  </tbody>
+</table>
+
+<!-- modal dialog -->
+<ng-template #content let-c="close" let-d="dismiss">
+  <div class="modal-header">
+    <h4 class="modal-title">Product</h4>
+    <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+
+    <form class="form-horizontal">
+      <div class="form-group">
+        <label for="name" class="col-xs-2 control-label">ISBN:</label>
+        <input type="text" class="form-control" name="name" value="{{productModal[0].isbn}}" />
+      </div>
+      <div class="form-group">
+        <label for="name" class="col-xs-2 control-label">Title:</label>
+        <input type="text" class="form-control" name="name" value="{{productModal[0].title}}" />
+      </div>
+      <div class="form-group">
+        <label for="name" class="col-xs-2 control-label">Price:</label>
+        <input type="text" class="form-control" name="name" value="{{productModal[0].price}}" />
+      </div>
+    </form>
+
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-secondary" (click)="c('Close click')">Close</button>
+  </div>
+</ng-template>

@@ -1,0 +1,7 @@
+.td-hover:hover {
+    text-decoration: underline;
+    cursor: pointer;
+}
+.table-product {
+    width: 85%;
+}

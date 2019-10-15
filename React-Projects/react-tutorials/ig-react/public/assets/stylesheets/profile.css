@@ -1,0 +1,92 @@
+#follow {
+  font-size: 0.9em;
+  font-weight: bold;
+  padding: 6px 30px;
+  margin-bottom:1px;
+}
+
+#follow .ig-btn {
+  padding: 5px 30px;
+  border-radius: 3px;
+}
+
+.gray-bg {
+  background-color: rgb(250, 250, 250);
+}
+
+.pic {
+  width: 293px;
+  height: 293px;
+  margin: 20px;
+  float: left
+}
+
+
+.pic:hover img{
+  opacity:0.7;
+}
+
+.pic:hover {
+  background-color: black;
+}
+
+.pic:hover .pic-stats {
+  visibility: visible;
+}
+
+.username {
+  display: inline-block;
+  font-size: 2em;
+  font-weight: lighter;
+  margin-bottom: 10px;
+}
+
+.float-left {
+  float: left;
+}
+
+.profile-nav {
+  width: 700px;
+  margin: auto;
+}
+
+.profile-nav p{
+  margin: 7px 20px 50px 40px;
+
+}
+
+#left-most {
+  margin-left: 217px;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.pic-stats {
+  color: white;
+  position: relative;
+  bottom: 180px;
+  visibility: hidden;
+}
+
+.container {
+  display: inline-block;
+  margin: 20px;
+  width: 70%;
+}
+
+.profile-img {
+  width: 152px;
+  height: 152px;
+  border-radius: 50%;
+  background-color: Silver;
+  margin-top: 10px;
+  position: relative;
+  top: 87px;
+  right: 100px
+}
+
+.inline-block {
+  display: inline-block;
+}

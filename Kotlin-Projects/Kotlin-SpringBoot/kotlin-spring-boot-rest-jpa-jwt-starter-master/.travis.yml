@@ -1,0 +1,16 @@
+language: java
+jdk: oraclejdk11
+services:
+  - mysql
+addons:
+  apt:
+    sources:
+      - mysql-5.7-trusty
+    packages:
+      - mysql-server
+      - mysql-client
+sudo: required
+before_install:
+  - sudo mysql_upgrade --force
+  - sudo mysql -e "CREATE DATABASE starterspringkotlin;GRANT ALL ON starterspringkotlin.* TO starterspringkotlin@localhost IDENTIFIED BY 'starterspringkotlin';FLUSH PRIVILEGES;"
+  - sudo service mysql restart

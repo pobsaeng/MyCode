@@ -1,0 +1,39 @@
+<nav class="navbar navbar-toggleable-md navbar-light bg-faded fixed-left">
+  <a class="navbar-brand" href="#">Point Of Sale (POS)</a>
+
+  <div class="collapse navbar-collapse">
+    <ul class="navbar-nav mr-auto">
+      <li class="nav-item active">
+        <a class="nav-link" routerLink='' routerLinkActive='active' [routerLinkActiveOptions]="{exact:true}"  href="#"><i class="fa fa-cube" style="font-size:30px;"></i></a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" routerLink='/categories' routerLinkActive='active' href="#"> <i class="fa fa-codepen" style="font-size:30px;"></i></a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" routerLink='/product' routerLinkActive='active' href="#"> <i class="fa fa-th-large" style="font-size:30px;"></i></a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" routerLink='/allgroupproduct' routerLinkActive='active' href="#"> <i class="fa fa-object-group" style="font-size:30px;"></i></a>
+      </li>
+    </ul>
+
+    <ul class="navbar-nav">
+      <li class="nav-item">
+        <a href="javascript:void(0)" class="nav-link">
+          <i class="fa fa-user" style="font-size:18px;"></i> Kraipob
+        </a>
+      </li>
+    </ul>
+
+  </div>
+</nav>
+
+<div class="container-fluid">
+  <div class="row-fluid">
+    <br/>
+    <!--style="border:1px solid #f4f6f6"-->
+    <div class="col-xl-12">
+      <router-outlet></router-outlet>
+    </div>
+  </div>
+</div>
